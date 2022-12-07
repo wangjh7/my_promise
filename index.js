@@ -44,16 +44,53 @@ function MyPromise(executor){
 }
 
 MyPromise.prototype.then = function (onfulfilled, onrejected){
-  onfulfilled = typeof onfulfilled == "function" ? onfulfilled : data => data
-  onrejected = typeof onrejected == "function" ? onrejected : error => {throw error}
+  //promise2将作为then方法的返回值
+  let promise2
+
   if(this.status == "fulfilled"){
-    onfulfilled(this.value)
+    return promise2 = new MyPromise((resolve,reject)=>{
+      setTimeout(()=>{
+        try{
+          //promise2的 被resovle函数处理的值为 onfulfilled的执行结果
+          let result = onfulfilled(this.value)
+          resolve(result)
+        } catch(e){
+          reject(e)
+        }
+      })
+    })
   }
   if(this.status == "rejected"){
-    onrejected(this.reason)
+    return promise2 = new MyPromise((resolve,reject)=>{
+      setTimeout(()=>{
+        try{
+          //promise2的 被resolve函数处理的值为 onrejected的执行结果
+          let result = onrejected(this.reason)
+          resolve(result)
+        } catch(e){
+          reject(e)
+        }
+      })
+    })
   }
   if(this.status == "pending"){
-    this.onFulfilledArray.push(onfulfilled)  
-    this.onRejectedArray.push(onrejected)
+    return promise2 = new MyPromise((resolve,reject)=>{
+      this.onFulfilledArray.push(()=>{
+        try{
+          let result = onfulfilled(this.value)
+          resolve(result)
+        } catch(e){
+          reject(e)
+        }
+      })
+      this.onRejectedArray.push(()=>{
+        try{
+          let result = onrejected(this.reason)
+          resolve(result)
+        } catch(e){
+          reject(e)
+        }
+      })
+    })
   }
 }
