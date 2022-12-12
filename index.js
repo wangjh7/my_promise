@@ -160,3 +160,56 @@ MyPromise.prototype.then = function (onfulfilled = Function.prototype, onrejecte
     })
   }
 }
+
+MyPromise.prototype.catch = function (catchFunc){
+  return this.then(nul,catchFunc)
+}
+
+MyPromise.resolve = function(value){
+  return new MyPromise((resolve,reject)=>{
+    resolve(value)
+  })
+}
+
+MyPromise.reject = function(value){
+  return new MyPromise((resolve,reject)=>{
+    reject(value)
+  })
+}
+
+MyPromise.all = function(promiseArray){
+  if(!Array.isArray(promiseArray)){
+    throw new TypeError("The arguments should be an array!")
+  }
+  return new MyPromise((resolve,reject)=>{
+    try{
+      let resultAry = []
+      const length = promiseArray.length
+      for(let i = 0; i < length; i++){
+        promiseArray[i].then(data=>{
+          resultAry.push(data)
+          if(resultAry.length === length)
+          resolve(resultAry)
+        },reject)
+      }
+    } catch(e){
+      reject(e)
+    }
+  })
+}
+
+MyPromise.race = function(promiseArray){
+  if(!Array.isArray(promiseArray)){
+    throw new TypeError("The arguments should be an array!")
+  }
+  return new Promise((resolve,reject)=>{
+    try{
+      const length = promiseArray.length
+      for(let i = 0; i < length; i++){
+        promiseArray[i].then(resolve,reject)
+      }
+    }catch(e){
+      reject(e)
+    }
+  })
+}
