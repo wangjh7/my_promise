@@ -102,7 +102,10 @@ const resolvePromise = (promise2,result,resolve,reject) => {
   }
 }
 
-MyPromise.prototype.then = function (onfulfilled, onrejected){
+MyPromise.prototype.then = function (onfulfilled = Function.prototype, onrejected = Function.prototype){
+  onfulfilled = typeof onfulfilled === 'function' ? onfulfilled : data => data
+  onrejected = typeof onrejected === 'function' ? onrejected : error => {throw error}
+
   //promise2将作为then方法的返回值
   let promise2
 
